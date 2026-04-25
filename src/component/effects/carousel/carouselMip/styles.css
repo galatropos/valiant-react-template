@@ -1,0 +1,23 @@
+/* Ajustes de viewport modernos y gestos */
+html, body, #root {
+  height: 100%;
+  margin: 0;
+}
+
+.App {
+  width: 100svw;   /* evita el bug de barras en móviles */
+  height: 100svh;  /* pantalla completa estable en iOS/Android */
+  overscroll-behavior: none;
+}
+
+/* Permite scroll vertical sin romper el drag horizontal */
+.App * {
+  touch-action: pan-y;
+}
+html, body, #root { height: 100%; margin: 0; }
+.stage {
+  width: 100svw;
+  height: 100svh;
+  background: #0b0b0b;       /* fondo distinto para que el gap se vea */
+  display: flex;
+}

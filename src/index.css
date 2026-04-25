@@ -1,0 +1,20 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden !important;
+}
+
+/* tu body fijo ocupando pantalla */
+body {
+  position: fixed;   /* <-- esto es lo correcto */
+  inset: 0;          /* top:0 right:0 bottom:0 left:0 */
+  user-select: none;
+  overscroll-behavior: none; /* evita “rebote” en navegadores que lo soportan */
+}
+
+/* iOS Safari: evita scroll por gesto en la página */
+body {
+  touch-action: none;
+}

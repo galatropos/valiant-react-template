@@ -1,0 +1,147 @@
+body {
+  padding: 0;
+  margin: 0;
+  min-height: 100vh;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+    "Segoe UI", sans-serif;
+}
+
+/* Contenedor principal dentro del Card */
+.app-root {
+  position: relative; /* coords relativas para el overlay */
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: visible;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* GRID que llena TODO el padre; filas/columnas se configuran por inline-style */
+.gallery-container {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  display: grid;
+  gap: 16px;
+
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+/* Cada item llena su celda del grid */
+.gallery-item {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 3px;
+  cursor: pointer;
+  overflow: hidden;
+
+  background: transparent;
+  box-shadow: none;
+}
+
+/* Las clases de tamaño ya no modifican altura (el grid manda) */
+.gallery-item.size-small,
+.gallery-item.size-medium,
+.gallery-item.size-tall,
+.gallery-item.size-wide {
+  /* sin height aquí */
+}
+
+/* Capa interna: SIEMPRE ocupa el 100% de la celda y recorta el contenido */
+.gallery-item-inner {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+
+  background: none;
+  border: none;
+  box-shadow: none;
+  backdrop-filter: none;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transform-origin: center;
+  transform: translateZ(0);
+  transition: transform 0.25s ease;
+}
+
+/* Cualquier cosa que metas dentro (div, texto, etc.) se limita visualmente */
+.gallery-item-inner > * {
+  max-width: 80%;
+  max-height: 80%;
+}
+
+/* IMÁGENES EN MODO COVER DENTRO DE LA CELDA */
+.gallery-item-inner img {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  object-fit: cover;
+  display: block;
+}
+
+/* Sin overlay interno extra */
+.gallery-item-inner::before {
+  content: none;
+}
+
+/* Hover */
+.gallery-item:hover .gallery-item-inner {
+  transform: translateY(-4px) scale(1.02);
+}
+
+/* Seleccionado */
+.gallery-item[data-selected="true"] .gallery-item-inner {
+  transform: translateY(-6px) scale(1.05);
+}
+
+/* Texto opcional dentro */
+.gallery-item-inner span {
+  color: #e5e7eb;
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Overlays flotantes dentro del Card */
+.gallery-overlay-item {
+  position: absolute; /* relativo a .app-root */
+  z-index: 50;
+  overflow: hidden;
+
+  box-shadow: none;
+  background: transparent;
+}
+
+/* Reusar capa interna para recortar */
+.gallery-overlay-item .gallery-item-inner {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: none;
+}

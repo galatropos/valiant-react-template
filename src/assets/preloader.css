@@ -1,0 +1,183 @@
+/* ===== Preloader full-screen ===== */
+#preloader {
+    position: fixed;
+    inset: 0;
+    background: #1a1a1a; /* 👈 fondo negro */
+    z-index: 9999;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+  
+    /* 👇 centrado del loader */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Fade-out cuando termina de cargar */
+  #preloader.preloader--hide {
+    opacity: 0;
+    pointer-events: none;
+  }
+  
+  /* ==== Animaciones originales ==== */
+  @keyframes spin {
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+  
+  @keyframes grow {
+    0%,
+    15%,
+    100% {
+      transform: scale(1);
+    }
+    5% {
+      transform: scale(1.2);
+    }
+  }
+  
+  /* ==== Wrapper circular ==== */
+  .wrapper {
+    position: relative;
+    width: 15rem;
+    height: 15rem;
+    border-radius: 50%;
+    filter: url("#goo");
+  }
+  
+  /* SVG del filtro gooey */
+  .goo-svg {
+    position: absolute;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+  }
+  
+  /* ==== Base del mixin on-circle: aplica a todos los hijos directos (burbujas + satWrap) ==== */
+  .wrapper > * {
+    display: block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 3rem; /* item-size */
+    height: 3rem;
+    margin: -1.5rem; /* -(item-size / 2) */
+  }
+  
+  /* ===== SOLO las burbujas van en círculo (1 a 8) ===== */
+  /* Radio = circle-size / 2 = 15rem / 2 = 7.5rem */
+  
+  .wrapper .bubbleWrap:nth-of-type(1) {
+    transform: rotate(0deg) translate(7.5rem) rotate(0deg);
+  }
+  .wrapper .bubbleWrap:nth-of-type(2) {
+    transform: rotate(45deg) translate(7.5rem) rotate(-45deg);
+  }
+  .wrapper .bubbleWrap:nth-of-type(3) {
+    transform: rotate(90deg) translate(7.5rem) rotate(-90deg);
+  }
+  .wrapper .bubbleWrap:nth-of-type(4) {
+    transform: rotate(135deg) translate(7.5rem) rotate(-135deg);
+  }
+  .wrapper .bubbleWrap:nth-of-type(5) {
+    transform: rotate(180deg) translate(7.5rem) rotate(-180deg);
+  }
+  .wrapper .bubbleWrap:nth-of-type(6) {
+    transform: rotate(225deg) translate(7.5rem) rotate(-225deg);
+  }
+  .wrapper .bubbleWrap:nth-of-type(7) {
+    transform: rotate(270deg) translate(7.5rem) rotate(-270deg);
+  }
+  .wrapper .bubbleWrap:nth-of-type(8) {
+    transform: rotate(315deg) translate(7.5rem) rotate(-315deg);
+  }
+  
+  /* Burbujas */
+  .bubbleWrap {
+    max-width: 100%;
+  }
+  
+  .bubbleWrap .bubble {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: #3a3a3a;
+  }
+  
+  /* Animación grow con delays, como en el SCSS original */
+  .wrapper .bubbleWrap:nth-of-type(1) .bubble {
+    animation: grow 4s ease infinite;
+    animation-delay: -0.1s;
+  }
+  .wrapper .bubbleWrap:nth-of-type(2) .bubble {
+    animation: grow 4s ease infinite;
+    animation-delay: 0.4s;
+  }
+  .wrapper .bubbleWrap:nth-of-type(3) .bubble {
+    animation: grow 4s ease infinite;
+    animation-delay: 0.9s;
+  }
+  .wrapper .bubbleWrap:nth-of-type(4) .bubble {
+    animation: grow 4s ease infinite;
+    animation-delay: 1.4s;
+  }
+  .wrapper .bubbleWrap:nth-of-type(5) .bubble {
+    animation: grow 4s ease infinite;
+    animation-delay: 1.9s;
+  }
+  .wrapper .bubbleWrap:nth-of-type(6) .bubble {
+    animation: grow 4s ease infinite;
+    animation-delay: 2.4s;
+  }
+  .wrapper .bubbleWrap:nth-of-type(7) .bubble {
+    animation: grow 4s ease infinite;
+    animation-delay: 2.9s;
+  }
+  .wrapper .bubbleWrap:nth-of-type(8) .bubble {
+    animation: grow 4s ease infinite;
+    animation-delay: 3.4s;
+  }
+  
+  /* ===== Satélite girando alrededor ===== */
+  /* satWrap también hereda el centrado de .wrapper > *,
+     pero NO las transformaciones de nth-of-type (esas solo son para .bubbleWrap) */
+  
+  .satWrap {
+    animation: spin 4s linear infinite;
+  }
+  
+  .sat {
+    width: 2.25em;
+    height: 2.25em;
+    background: #858585;
+    border-radius: 50%;
+    margin-left: 7.875em; /* órbita */
+    box-shadow: 0px 0px 50px -4px #fff;
+  }
+  
+  /* ===== Logo centrado con animación suave ===== */
+  
+  @keyframes logoBounce {
+    0%,
+    100% {
+      transform: translate(-50%, -50%) scale(1);
+    }
+    50% {
+      transform: translate(-50%, -50%) scale(1.06);
+    }
+  }
+  
+  .preloader-logo {
+    position: fixed;              /* no afecta layout interno */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 120px;                 /* ajusta el tamaño de tu logo aquí */
+    height: auto;
+    pointer-events: none;         /* no bloquea clicks */
+    z-index: 10000;               /* encima de burbujas/satélite */
+    animation: logoBounce 2.4s ease-in-out infinite;
+    filter:brightness(0) contrast(20) invert(1);
+  }
+  

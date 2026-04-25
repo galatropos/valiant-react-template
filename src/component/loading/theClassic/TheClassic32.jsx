@@ -1,0 +1,33 @@
+import React from "react";
+
+const TheClassic32 = ({ text = "Loading..." }) => (
+  <>
+    <style>{`
+      .loader {
+        width: fit-content;
+        font-weight: bold;
+        font-family: monospace;
+        text-shadow:
+          0 0 0 rgb(255 0 0),
+          0 0 0 rgb(0 255 0),
+          0 0 0 rgb(0 0 255);
+        font-size: 30px;
+        animation: l32 1s infinite cubic-bezier(0.5,-2000,0.5,2000);
+      }
+      .loader:before {
+        content:"${text}";
+      }
+      @keyframes l32{
+        25%,100% {
+          text-shadow:
+            0.03px -0.01px 0.01px rgb(255 0 0),
+            0.02px  0.02px 0     rgb(0 255 0),
+           -0.02px  0.02px 0     rgb(0 0 255);
+        }
+      }
+    `}</style>
+    <div className="loader" />
+  </>
+);
+
+export default TheClassic32;

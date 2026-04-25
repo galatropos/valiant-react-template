@@ -1,0 +1,221 @@
+genial — aquí tienes un “manual/contrato” de cómo hablamos el animate para que, aunque cambies de chat, me pegas esto y yo entienda EXACTAMENTE tu formato y expectativas sin fallas.
+
+Especificación de animate (contrato)
+1) Forma del dato
+
+Tipo: array de pasos.
+
+Cada paso: [ { props… }, duraciónMs ]
+
+Ejemplo:
+
+const animateX = [
+  [{ x: 0.2, y: -0.1, rotate: -0.5 }, 200],
+  [{ x: 0.0, y:  0.2, rotate:  0.3 }, 200],
+  // ...
+];
+
+2) Sistema de coordenadas (muy importante)
+
+x > 0 → se mueve a la derecha.
+
+x < 0 → izquierda.
+
+y > 0 → baja (hacia abajo).
+
+y < 0 → sube.
+
+rotate → giro en Z (plano 2D).
+
+rotateX, rotateY → giros 3D (eje X/Y).
+
+Los valores de cada paso son “deltas acumulados” por defecto en tu runner: lo que sumas en pasos, se acumula.
+👉 Por eso, si quieres regresar al origen, las sumas de x, y, rotate, rotateX, rotateY… deben ser 0 en el bloque (ver §5).
+
+3) Propiedades soportadas
+
+Traslación: x, y
+
+Rotaciones: rotate (Z), rotateX, rotateY (grados)
+
+Escalas: scale, scaleX, scaleY
+
+Apariencia: opacity (0–1)
+
+Tamaño (en % del contenedor): width, height
+
+Texto: fontSize (en % del ancho del contenedor)
+
+3D: perspective (px). Recomendación: poner la perspective en el padre; si se usa en Card, funciona pero la preferencia es en el contenedor.
+
+4) Duración por paso
+
+El número después del objeto es milisegundos para ese paso.
+
+Puedes mezclar duraciones: p. ej., 300 ms, 200 ms, etc.
+
+La duración total es la suma de los tiempos del array (útil cuando pides “exactamente 2 s”).
+
+5) Reglas de “cierre” y cómo evitar deriva/aleteo
+
+Si quieres que, al terminar un bloque, el elemento vuelva al origen, entonces:
+
+Suma de x = 0
+
+Suma de y = 0
+
+Suma de rotate = 0
+
+Suma de rotateX = 0
+
+Suma de rotateY = 0
+
+Suma de scale, scaleX, scaleY = 0 (si estás usando deltas de escala)
+
+opacity puede ser absoluta (0→1) o delta; cuando pidas “fade de 3s”, definimos claro si sube 0→1 o si sumas deltas hasta 1.
+
+Intro en deltas “cerrando 0”: si el intro mueve y/rotate, la segunda mitad debe compensar para que Σ sea 0.
+
+Loops: los bloques que se repiten deben estar balanceados (Σ=0) o derivarán con el tiempo.
+
+6) Transform en el Card (orden correcto)
+
+Para que rotateY(+/-) se sienta bien y los ejes sean estables:
+
+Orden (CSS aplica de derecha a izquierda):
+
+perspective(...) (mejor en el padre)
+
+scale, scaleX, scaleY
+
+rotateZ (=rotate)
+
+rotateY
+
+rotateX
+
+transformOrigin: por defecto "50% 50%".
+
+backfaceVisibility: visible si quieres ver la cara trasera en vueltacompleta Y/X; hidden para ocultarla.
+
+Evita scaleX/scaleY negativos en el mismo nodo que rota en Y/X (deforman ejes y dan “abanico”). Si necesitas flips, separamos en wrappers.
+
+7) Perspectiva y 3D
+
+Poner perspective: 800–1000px en el padre del Card:
+
+<div style={{ perspective: 900, transformStyle: 'preserve-3d' }}>
+  <Card ... />
+</div>
+
+
+Con eso, rotateY(-15) y rotateY(15) se ven en sentidos opuestos claramente.
+
+8) Anclas y tamaños
+
+width, height son % del contenedor del Card.
+
+anchor controla desde dónde se calcula left/top.
+
+Recomendado para cambios de tamaño: anchor: "middle" (no “empuja” al cambiar width/height).
+
+9) Patrones que usamos mucho (plantillas)
+(A) Intro de opacity 3s, sin pausa (termina en opacity=1)
+// 10 pasos × 300 ms = 3000 ms
+[{ opacity: 0.00 }, 300],
+[{ opacity: 0.10 }, 300],
+[{ opacity: 0.20 }, 300],
+[{ opacity: 0.30 }, 300],
+[{ opacity: 0.40 }, 300],
+[{ opacity: 0.50 }, 300],
+[{ opacity: 0.60 }, 300],
+[{ opacity: 0.70 }, 300],
+[{ opacity: 0.80 }, 300],
+[{ opacity: 1.00 }, 300],
+
+(B) Loop flote (Σ=0 en x,y,rotate; 1.2 s)
+[{ x:  0.25, y: -0.20, rotate: -0.6 }, 200],
+[{ x:  0.15, y:  0.00, rotate: -0.2 }, 200],
+[{ x:  0.00, y:  0.20, rotate:  0.2 }, 200],
+[{ x: -0.25, y:  0.20, rotate:  0.6 }, 200],
+[{ x: -0.15, y:  0.00, rotate:  0.2 }, 200],
+[{ x:  0.00, y: -0.20, rotate: -0.2 }, 200],
+// Σx=0, Σy=0, Σrotate=0 (no deriva)
+
+(C) Sacudida (shake) con cierre en origen (Σx=Σy=0)
+[{ x:  0.6, y: -0.4 }, 50],
+[{ x: -0.8, y:  0.5 }, 50],
+[{ x:  0.7, y:  0.3 }, 50],
+[{ x: -0.5, y: -0.6 }, 50],
+[{ x:  0.3, y:  0.2 }, 50],
+[{ x: -0.3, y:  0.0 }, 50],
+[{ x:  0.2, y:  0.1 }, 50],
+[{ x: -0.2, y: -0.1 }, 50],
+[{ x:  0.0, y:  0.0 }, 50],
+// total 9 pasos (450 ms) — si quieres 500 ms, mete 10 pasos o ajusta a 56 ms
+
+(D) Ola (wave) para tarjeta — énfasis rotateY y cierre limpio
+[{ x: -0.6, y:  0.0, rotateY: -12, rotateX:  4 }, 100],
+[{ x: -0.4, y: -0.1, rotateY: -9,  rotateX:  3 }, 100],
+[{ x: -0.2, y: -0.2, rotateY: -6,  rotateX:  2 }, 100],
+[{ x:  0.0, y: -0.1, rotateY: -3,  rotateX:  1 }, 100],
+[{ x:  0.2, y:  0.0, rotateY:  0,  rotateX:  0 }, 100],
+[{ x:  0.4, y:  0.1, rotateY:  3,  rotateX: -1 }, 100],
+[{ x:  0.6, y:  0.2, rotateY:  6,  rotateX: -2 }, 100],
+[{ x:  0.8, y:  0.1, rotateY:  9,  rotateX: -3 }, 100],
+[{ x:  1.0, y:  0.0, rotateY: 12,  rotateX: -4 }, 100],
+[{ x:  0.8, y: -0.1, rotateY:  9,  rotateX: -3 }, 100],
+[{ x:  0.6, y: -0.2, rotateY:  6,  rotateX: -2 }, 100],
+[{ x:  0.4, y: -0.1, rotateY:  3,  rotateX: -1 }, 100],
+[{ x:  0.2, y:  0.0, rotateY:  0,  rotateX:  0 }, 100],
+[{ x:  0.0, y:  0.1, rotateY: -3,  rotateX:  1 }, 100],
+[{ x: -0.2, y:  0.2, rotateY: -6,  rotateX:  2 }, 100],
+[{ x: -0.4, y:  0.1, rotateY: -9,  rotateX:  3 }, 100],
+[{ x: -0.6, y:  0.0, rotateY: -12, rotateX:  4 }, 100],
+
+(E) Coin spin Y sin interpolación (pasos “hold/jump”)
+
+Evita “camino corto”: pasos crecientes o “saltos” cortos.
+
+[{ rotateY:   0 }, 90], [{ rotateY:  60 }, 10],
+[{ rotateY:  60 }, 90], [{ rotateY: 120 }, 10],
+[{ rotateY: 120 }, 90], [{ rotateY: 180 }, 10],
+[{ rotateY: 180 }, 90], [{ rotateY: 240 }, 10],
+[{ rotateY: 240 }, 90], [{ rotateY: 300 }, 10],
+[{ rotateY: 300 }, 90], [{ rotateY: 360 }, 10],
+
+10) Validación rápida antes de cerrar un bloque
+
+¿El bloque debe regresar al origen?
+
+Suma x, y, rotate, rotateX, rotateY, scale* → ¿0?
+
+¿Intro de opacity?
+
+¿Llega de 0 → 1 en el tiempo pedido?
+
+¿Sin pausa si lo pediste explícito?
+
+Duración total
+
+¿Coincide con lo solicitado (p. ej. 2000 ms, 3000 ms)?
+
+3D visible
+
+¿Hay perspective en el padre? (800–1000)
+
+¿Orden de rotaciones correcto? (… rotateZ → rotateY → rotateX)
+
+Nada de scaleX/scaleY negativos en el mismo nodo que rota Y/X (para evitar “abanico”).
+
+11) Cómo pedirme cambios en cualquier chat
+
+Pégame este bloque al inicio del chat y luego dame la instrucción concreta. Ejemplos de comando:
+
+“Quiero intro de opacity 3s sin pausa, luego flote 2 ciclos.”
+
+“Haz un shake de 500 ms con 10 pasos y que Σx=Σy=0.”
+
+“Dame un wave U suave 2 s total; y profundiza un 10% más pero ΣrotateX/ΣrotateY=0.”
+
+“Agrega width/height al wave: base 40×24 (%), y que el cierre vuelva a 40×24.”
