@@ -1,4 +1,4 @@
-import Project from "../project/dressly20260410/Index";
+import Project from "../project/20260415FitXSIPS/Index";
 import ScaledContainer from "./component/container";
 import  ElementProvider from "./context/ContextElement";
 
@@ -12,8 +12,8 @@ return(
 
 
 <ScaledContainer
-       mode="client"
-     //   mode="developer"
+     //  mode="client"
+       mode="developer"
       >
         <Project />
 

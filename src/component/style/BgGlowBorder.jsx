@@ -1,7 +1,7 @@
 import React from 'react'
 import hexadecimalToRgba from '../../utils/hexadecimalToRgba'
 
-const BgGlowBorder = ({image,classNameAssing,colorBorder="white",colorGlow="white", borderRadius=16 ,inset=0,glowExt=20, weight=3,boxShadow=300}) => {
+const BgGlowBorder = ({classNameAssing,colorBorder="white",colorGlow="white", borderRadius=16 ,inset=0,glowExt=20, weight=3,boxShadow=300}) => {
 
 const rgba=hexadecimalToRgba(colorGlow,0.9)
 

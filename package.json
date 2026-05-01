@@ -11,6 +11,7 @@
     "finish-all": "node scripts/finish-all.mjs",
     "new": "node scripts/createProject.js",
     "upload": "node scripts/upload.mjs",
+    "pending": "node scripts/pending.mjs",
     "lint": "eslint .",
     "preview": "vite preview"
   },
